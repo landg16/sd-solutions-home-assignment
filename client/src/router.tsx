@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
-import TasksPage from './pages/tasks-page.tsx';
-import TaskFormPage from './pages/task-form-page.tsx';
-import Layout from './components/layout.tsx';
+import TasksPage from './pages/tasks.tsx';
+import CreateTaskPage from './pages/create-task.tsx';
+import Layout from './components/layout/layout.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -14,11 +14,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/new',
-        element: <TaskFormPage />,
+        element: <CreateTaskPage />,
       },
       {
         path: '/edit/:id',
-        element: <TaskFormPage />,
+        element: <CreateTaskPage />,
       },
     ],
   },

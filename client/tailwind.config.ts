@@ -1,13 +1,11 @@
 module.exports = {
-    content: [
-        "./src/**/*.{js,jsx,ts,tsx}",
-    ],
-    theme: {
-        extend: {
-            fontFamily: {
-                'noto': ['Noto Sans', 'serif'],
-            },
-        },
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        noto: ['Noto Sans', 'serif'],
+      },
     },
-    plugins: [],
-}
+  },
+  plugins: [],
+};
