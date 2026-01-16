@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
-import { cn } from '@/lib/utils.ts';
+import { cn, generateRandomCircles } from '@/lib/utils.ts';
+import { Label } from '@/components/ui/label';
 
 interface TaskCardProps {
   task: Task;
@@ -28,20 +29,14 @@ const priorityColors = {
 export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDelete, onEdit }) => {
   const isCompleted = task.status === 'completed';
 
-  const circles = useMemo(() => {
-    const count = 3 + Math.floor(Math.random() * 3);
-    return Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      size: 6 + Math.random() * 16,
-      top: Math.random() * 100,
-      right: Math.random() * 100,
-      opacity: 0.1 + Math.random() * 0.2,
-    }));
-  }, []);
+  const circles = useMemo(() => generateRandomCircles(), []);
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-finch-200 p-4 transition-all ${isCompleted ? 'opacity-80' : ''}`}
+      className={cn(
+        'relative overflow-hidden rounded-xl bg-finch-200 p-4 transition-all h-full',
+        isCompleted ?? 'opacity-80',
+      )}
     >
       {circles.map((circle) => (
         <div
@@ -59,9 +54,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
       ))}
 
       <div className='relative z-10 flex flex-col h-full'>
-        <div className='flex justify-between items-start mb-4'>
+        <div className='flex justify-between items-start'>
           <div className='flex items-start gap-3'>
             <Checkbox
+              id={task.id}
               checked={isCompleted}
               onCheckedChange={(checked: boolean) =>
                 onStatusChange(task.id, checked ? 'completed' : 'pending')
@@ -69,31 +65,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
               className='mt-1 border-finch-600 data-[state=checked]:bg-finch-600 data-[state=checked]:text-finch-50'
             />
             <div className='space-y-1'>
-              <h3
+              <Label
+                htmlFor={task.id}
                 className={cn(
                   'text-xl font-bold tracking-tight text-finch-950',
                   isCompleted ? 'line-through opacity-70' : '',
                 )}
               >
                 {task.title}
-              </h3>
-              <div className='flex gap-2'>
-                <Badge
-                  variant='secondary'
-                  className={cn(priorityColors[task.priority], 'border-transparent')}
-                >
-                  {task.priority}
-                </Badge>
-                {task.dueDate && (
-                  <Badge
-                    variant='outline'
-                    className='flex items-center gap-1 border-finch-400 text-finch-800 bg-finch-100/50'
-                  >
-                    <CalendarIcon className='h-3 w-3' />
-                    {new Date(task.dueDate).toLocaleDateString()}
-                  </Badge>
-                )}
-              </div>
+              </Label>
             </div>
           </div>
 
@@ -125,6 +105,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
           </DropdownMenu>
         </div>
 
+        <div className='flex mb-4 mt-2'>
+          <div className='flex gap-2'>
+            <Badge
+              variant='secondary'
+              className={cn(priorityColors[task.priority], 'border-transparent')}
+            >
+              {task.priority}
+            </Badge>
+            {task.dueDate && (
+              <Badge
+                variant='outline'
+                className='flex items-center gap-1 border-finch-400 text-finch-800 bg-finch-100/50'
+              >
+                <CalendarIcon className='h-3 w-3' />
+                {new Date(task.dueDate).toLocaleDateString()}
+              </Badge>
+            )}
+          </div>
+        </div>
+
         <div className='grow'>
           {task.description && (
             <p className='text-sm text-finch-800 line-clamp-3 mb-4 font-medium'>
@@ -139,7 +139,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
             <span>Created {new Date(task.createdAt).toLocaleDateString()}</span>
           </div>
           <div
-            className={`px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider ${isCompleted ? 'bg-green-100 text-green-700' : 'bg-finch-300 text-finch-900'}`}
+            className={cn(
+              'px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider',
+              isCompleted ? 'bg-green-100 text-green-700' : 'bg-finch-300 text-finch-900',
+            )}
           >
             {task.status}
           </div>

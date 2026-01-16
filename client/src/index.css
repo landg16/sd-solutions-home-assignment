@@ -118,7 +118,7 @@ body {
     --color-chart-2: var(--chart-2);
     --color-chart-3: var(--chart-3);
     --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
+    --color-chart-5: var(--color-chart-5);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -130,7 +130,7 @@ body {
 }
 
 .dark {
-    --background: oklch(0.129 0.042 264.695);
+    --background: var(--color-finch-950);
     --foreground: oklch(0.984 0.003 247.858);
     --card: oklch(0.208 0.042 265.755);
     --card-foreground: oklch(0.984 0.003 247.858);
