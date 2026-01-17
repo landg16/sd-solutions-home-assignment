@@ -33,12 +33,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
 
   const circles = useMemo(() => generateRandomCircles(), []);
 
+  const isOverdue = useMemo(() => {
+    if (!task.dueDate || isCompleted) return false;
+    return new Date(task.dueDate) < new Date();
+  }, [task.dueDate, isCompleted]);
+
   return (
     <div
       className={cn(
         'relative overflow-hidden rounded-xl bg-finch-200 p-4 transition-all h-full',
         isCompleted ?? 'opacity-80',
-        isDeleting && 'opacity-50 pointer-events-none'
+        isDeleting && 'opacity-50 pointer-events-none',
+        isOverdue && 'bg-red-50 border-2 border-red-200'
       )}
     >
       {isDeleting && (
@@ -83,6 +89,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
                 className={cn(
                   'text-xl font-bold tracking-tight text-finch-950',
                   isCompleted ? 'line-through opacity-70' : '',
+                  isOverdue && 'text-red-900'
                 )}
               >
                 {task.title}
@@ -129,7 +136,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
             {task.dueDate && (
               <Badge
                 variant='outline'
-                className='flex items-center gap-1 border-finch-400 text-finch-800 bg-finch-100/50'
+                className={cn(
+                  'flex items-center gap-1 border-finch-400 text-finch-800 bg-finch-100/50',
+                  isOverdue && 'border-red-400 text-red-800 bg-red-100/50'
+                )}
               >
                 <CalendarIcon className='h-3 w-3' />
                 {new Date(task.dueDate).toLocaleDateString()}
@@ -149,7 +159,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
         <div className='mt-auto pt-4 flex justify-between items-center text-xs text-finch-700 font-medium border-t border-finch-300/50'>
           <div className='flex items-center gap-1'>
             <Clock className='h-3 w-3' />
-            <span>Created {new Date(task.createdAt).toLocaleDateString()}</span>
+            <span>Updated {new Date(task.updatedAt).toLocaleString()}</span>
           </div>
           <div
             className={cn(

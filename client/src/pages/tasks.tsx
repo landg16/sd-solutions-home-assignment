@@ -75,17 +75,17 @@ const TasksPage = () => {
 
   return (
     <div className='container mx-auto p-4 space-y-6'>
-      <div className='flex justify-between items-center'>
+      <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Tasks</h1>
           <p className='text-muted-foreground'>Manage your daily tasks and projects.</p>
         </div>
-        <div className='flex items-center gap-4'>
+        <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto'>
           <div className='relative'>
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as 'all' | 'pending' | 'completed')}
-              className='h-10 w-45 appearance-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+              className='h-10 w-full sm:w-45 appearance-none rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
             >
               <option value='all'>All Tasks</option>
               <option value='pending'>Pending</option>
@@ -93,7 +93,7 @@ const TasksPage = () => {
             </select>
             <ChevronDown className='absolute right-3 top-3 h-4 w-4 opacity-50 pointer-events-none' />
           </div>
-          <Button asChild>
+          <Button asChild className='w-full sm:w-auto'>
             <Link to='/new'>
               <Plus className='mr-2 h-4 w-4' /> Add Task
             </Link>
