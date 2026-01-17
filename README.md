@@ -75,7 +75,17 @@ The project is structured as a monorepo using **pnpm workspaces**.
     pnpm install
     ```
 
-2.  **Start Development Servers**:
+2.  **Environment Setup**:
+    -   **Client**: Copy `client/.env.example` to `client/.env`.
+        ```bash
+        cp client/.env.example client/.env
+        ```
+    -   **Server**: Copy `server/.env.example` to `server/.env`.
+        ```bash
+        cp server/.env.example server/.env
+        ```
+
+3.  **Start Development Servers**:
     Run both client and server concurrently from the root:
     ```bash
     pnpm dev

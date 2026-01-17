@@ -1,8 +1,10 @@
 import type { CreateTaskFormData } from '@/components/create-task-form.tsx';
 import type { Task } from '@/types/task.ts';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const fetchTask = async (id: string): Promise<Task> => {
-  const response = await fetch(`http://localhost:8000/tasks/${id}`);
+  const response = await fetch(`${API_URL}/tasks/${id}`);
   if (!response.ok) {
     throw new Error('Failed to fetch task');
   }
@@ -10,7 +12,7 @@ export const fetchTask = async (id: string): Promise<Task> => {
 };
 
 export const createTask = async (data: CreateTaskFormData): Promise<Task> => {
-  const response = await fetch('http://localhost:8000/tasks', {
+  const response = await fetch(`${API_URL}/tasks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -31,7 +33,7 @@ export const updateTask = async ({
   id: string;
   data: CreateTaskFormData;
 }): Promise<Task> => {
-  const response = await fetch(`http://localhost:8000/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -46,7 +48,7 @@ export const updateTask = async ({
 };
 
 export const fetchTasks = async (status: 'all' | 'pending' | 'completed'): Promise<Task[]> => {
-  const url = new URL('http://localhost:8000/tasks');
+  const url = new URL(`${API_URL}/tasks`);
   if (status !== 'all') {
     url.searchParams.append('status', status);
   }
@@ -65,7 +67,7 @@ export const updateTaskStatus = async ({
   id: string;
   status: 'pending' | 'completed';
 }) => {
-  const response = await fetch(`http://localhost:8000/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -79,7 +81,7 @@ export const updateTaskStatus = async ({
 };
 
 export const deleteTask = async (id: string) => {
-  const response = await fetch(`http://localhost:8000/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/tasks/${id}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
