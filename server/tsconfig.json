@@ -34,13 +34,8 @@
     "resolveJsonModule": true
     /* Enable importing .json files. */
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   /* Include everything in src. */
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["node_modules", "**/*.spec.ts"]
   /* Exclude node_modules and test files from the build. */
 }

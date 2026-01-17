@@ -16,14 +16,12 @@ beforeEach(async () => {
 
 describe('Task API Endpoints', () => {
   it('should create a new task', async () => {
-    const res = await request(app)
-      .post('/tasks')
-      .send({
-        title: 'Test Task',
-        description: 'Test Description',
-        priority: 'medium',
-        status: 'pending',
-      });
+    const res = await request(app).post('/tasks').send({
+      title: 'Test Task',
+      description: 'Test Description',
+      priority: 'medium',
+      status: 'pending',
+    });
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toHaveProperty('id');
@@ -31,13 +29,11 @@ describe('Task API Endpoints', () => {
   });
 
   it('should fail to create task with invalid data', async () => {
-    const res = await request(app)
-      .post('/tasks')
-      .send({
-        title: '', // Empty title
-        priority: 'invalid_priority',
-        status: 'pending',
-      });
+    const res = await request(app).post('/tasks').send({
+      title: '', // Empty title
+      priority: 'invalid_priority',
+      status: 'pending',
+    });
 
     expect(res.statusCode).toEqual(400);
     expect(res.body.message).toBe('Validation failed');
@@ -117,28 +113,29 @@ describe('Task API Endpoints', () => {
     const getRes = await request(app).get(`/tasks/${taskId}`);
     expect(getRes.statusCode).toEqual(404);
   });
-  
+
   it('should filter tasks by status', async () => {
-      await request(app).post('/tasks').send({
-          title: 'Pending Task',
-          priority: 'medium',
-          status: 'pending',
-      });
-      await request(app).post('/tasks').send({
-          title: 'Completed Task',
-          priority: 'medium',
-          status: 'completed',
-      });
+    await request(app).post('/tasks').send({
+      title: 'Pending Task',
+      priority: 'medium',
+      status: 'pending',
+    });
+    await request(app).post('/tasks').send({
+      title: 'Completed Task',
+      priority: 'medium',
+      status: 'completed',
+    });
 
-      const resPending = await request(app).get('/tasks?status=pending');
-      expect(resPending.statusCode).toEqual(200);
-      expect(resPending.body.length).toBe(1);
-      expect(resPending.body[0].status).toBe('pending');
+    const resPending = await request(app).get('/tasks?status=pending');
+    expect(resPending.statusCode).toEqual(200);
+    expect(resPending.body.length).toBe(1);
+    expect(resPending.body[0].status).toBe('pending');
 
-      const resCompleted = await request(app).get('/tasks?status=completed');
-      expect(resCompleted.statusCode).toEqual(200);
-      expect(resCompleted.body.length).toBe(1);
-      expect(resCompleted.body[0].status).toBe('completed');
+    const resCompleted = await request(app).get('/tasks?status=completed');
+    console.log('resCompleted', resCompleted);
+    expect(resCompleted.statusCode).toEqual(200);
+    expect(resCompleted.body.length).toBe(1);
+    expect(resCompleted.body[0].status).toBe('completed');
   });
 
   it('should return 400 for invalid status filter', async () => {

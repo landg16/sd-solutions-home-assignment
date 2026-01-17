@@ -8,7 +8,7 @@ export const getTasks = async (req: Request, res: Response) => {
   let tasks = await readTasks();
 
   if (status && status !== 'all') {
-    tasks = tasks.filter(task => task.status === status);
+    tasks = tasks.filter((task) => task.status === status);
   }
 
   res.json(tasks);
@@ -17,7 +17,7 @@ export const getTasks = async (req: Request, res: Response) => {
 export const getTaskById = async (req: Request, res: Response) => {
   const { id } = req.params;
   const tasks = await readTasks();
-  const task = tasks.find(t => t.id === id);
+  const task = tasks.find((t) => t.id === id);
 
   if (!task) {
     res.status(404).json({ message: 'Task not found' });
@@ -44,7 +44,7 @@ export const createTask = async (req: Request, res: Response) => {
   const tasks = await readTasks();
   tasks.push(newTask);
   await writeTasks(tasks);
-  
+
   res.status(201).json(newTask);
 };
 
@@ -53,7 +53,7 @@ export const updateTask = async (req: Request, res: Response) => {
   const { title, description, priority, dueDate, status } = req.body;
 
   const tasks = await readTasks();
-  const taskIndex = tasks.findIndex(t => t.id === id);
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
   if (taskIndex === -1) {
     res.status(404).json({ message: 'Task not found' });
@@ -72,14 +72,14 @@ export const updateTask = async (req: Request, res: Response) => {
 
   tasks[taskIndex] = updatedTask;
   await writeTasks(tasks);
-  
+
   res.json(updatedTask);
 };
 
 export const deleteTask = async (req: Request, res: Response) => {
   const { id } = req.params;
   const tasks = await readTasks();
-  const taskIndex = tasks.findIndex(t => t.id === id);
+  const taskIndex = tasks.findIndex((t) => t.id === id);
 
   if (taskIndex === -1) {
     res.status(404).json({ message: 'Task not found' });
@@ -88,6 +88,6 @@ export const deleteTask = async (req: Request, res: Response) => {
 
   tasks.splice(taskIndex, 1);
   await writeTasks(tasks);
-  
+
   res.status(204).send();
 };

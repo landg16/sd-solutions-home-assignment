@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import type { Task } from '../types/task';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, Clock, MoreVertical } from 'lucide-react';
+import { CalendarIcon, Clock, MoreVertical, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +18,8 @@ interface TaskCardProps {
   onStatusChange: (id: string, status: 'pending' | 'completed') => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  isUpdating?: boolean;
+  isDeleting?: boolean;
 }
 
 const priorityColors = {
@@ -26,7 +28,7 @@ const priorityColors = {
   high: 'bg-red-100 text-red-800 hover:bg-red-100',
 };
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDelete, onEdit }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDelete, onEdit, isUpdating, isDeleting }) => {
   const isCompleted = task.status === 'completed';
 
   const circles = useMemo(() => generateRandomCircles(), []);
@@ -36,8 +38,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
       className={cn(
         'relative overflow-hidden rounded-xl bg-finch-200 p-4 transition-all h-full',
         isCompleted ?? 'opacity-80',
+        isDeleting && 'opacity-50 pointer-events-none'
       )}
     >
+      {isDeleting && (
+        <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/50 dark:bg-black/50">
+          <Loader2 className="h-8 w-8 animate-spin text-destructive" />
+        </div>
+      )}
+
       {circles.map((circle) => (
         <div
           key={circle.id}
@@ -56,14 +65,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, onStatusChange, onDele
       <div className='relative z-10 flex flex-col h-full'>
         <div className='flex justify-between items-start'>
           <div className='flex items-start gap-3'>
-            <Checkbox
-              id={task.id}
-              checked={isCompleted}
-              onCheckedChange={(checked: boolean) =>
-                onStatusChange(task.id, checked ? 'completed' : 'pending')
-              }
-              className='mt-1 border-finch-600 data-[state=checked]:bg-finch-600 data-[state=checked]:text-finch-50'
-            />
+            {isUpdating ? (
+              <Loader2 className="h-4 w-4 animate-spin mt-1 text-finch-600" />
+            ) : (
+              <Checkbox
+                id={task.id}
+                checked={isCompleted}
+                onCheckedChange={(checked: boolean) =>
+                  onStatusChange(task.id, checked ? 'completed' : 'pending')
+                }
+                className='mt-1 border-finch-600 data-[state=checked]:bg-finch-600 data-[state=checked]:text-finch-50'
+              />
+            )}
             <div className='space-y-1'>
               <Label
                 htmlFor={task.id}

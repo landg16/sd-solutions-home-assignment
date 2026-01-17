@@ -1,32 +1,77 @@
 import { useState } from 'react';
-import { mockTasks } from '@/data/mock-tasks';
 import { TaskCard } from '@/components/task-card';
 import { Button } from '@/components/ui/button';
-import { Plus, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import type { Task } from '@/types/task';
+import { Plus, ChevronDown, Loader2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteTask, fetchTasks, updateTaskStatus } from '@/lib/fetches.ts';
 
 const TasksPage = () => {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const {
+    data: tasks = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['tasks', filter],
+    queryFn: () => fetchTasks(filter),
+  });
+
+  const { mutate: updateStatus } = useMutation({
+    mutationFn: updateTaskStatus,
+    onMutate: (variables) => {
+      setUpdatingTaskId(variables.id);
+    },
+    onSettled: () => {
+      setUpdatingTaskId(null);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
+
+  const { mutate: removeTask } = useMutation({
+    mutationFn: deleteTask,
+    onMutate: (id) => {
+      setDeletingTaskId(id);
+    },
+    onSettled: () => {
+      setDeletingTaskId(null);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+  });
 
   const handleStatusChange = (id: string, status: 'pending' | 'completed') => {
-    setTasks(tasks.map((t) => (t.id === id ? { ...t, status } : t)));
+    updateStatus({ id, status });
   };
 
   const handleDelete = (id: string) => {
-    setTasks(tasks.filter((t) => t.id !== id));
+    removeTask(id);
   };
 
   const handleEdit = (id: string) => {
-    console.log('Edit task', id);
+    navigate(`/edit/${id}`);
   };
 
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === 'all') return true;
-    return task.status === filter;
-  });
+  if (isError) {
+    return (
+      <div className='container mx-auto p-4 flex justify-center items-center h-[50vh]'>
+        <div className='text-center text-destructive'>
+          <h3 className='text-lg font-semibold'>Error loading tasks</h3>
+          <p>{error instanceof Error ? error.message : 'Unknown error'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='container mx-auto p-4 space-y-6'>
@@ -56,29 +101,37 @@ const TasksPage = () => {
         </div>
       </div>
 
-      <motion.div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3' layout>
-        <AnimatePresence mode='popLayout'>
-          {filteredTasks.map((task) => (
-            <motion.div
-              key={task.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TaskCard
-                task={task}
-                onStatusChange={handleStatusChange}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      {isLoading ? (
+        <div className='flex justify-center items-center h-64'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+        </div>
+      ) : (
+        <motion.div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3' layout>
+          <AnimatePresence mode='popLayout'>
+            {tasks.map((task) => (
+              <motion.div
+                key={task.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TaskCard
+                  task={task}
+                  onStatusChange={handleStatusChange}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  isUpdating={updatingTaskId === task.id}
+                  isDeleting={deletingTaskId === task.id}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
 
-      {filteredTasks.length === 0 && (
+      {!isLoading && tasks.length === 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -86,9 +139,7 @@ const TasksPage = () => {
         >
           <h3 className='text-lg font-semibold'>No tasks found</h3>
           <p className='text-muted-foreground'>
-            {filter === 'all'
-              ? 'Get started by creating a new task.'
-              : `No ${filter} tasks found.`}
+            {filter === 'all' ? 'Get started by creating a new task.' : `No ${filter} tasks found.`}
           </p>
         </motion.div>
       )}
